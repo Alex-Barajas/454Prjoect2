@@ -97,17 +97,98 @@ def convertNFAtoDFA(N):
     return M
 
 
-# delta = {'q0': {'0': set(['q0', 'q1']), '1': set(['q0'])}, 'q1': {'1': set(['q2'])}}
-# N = NFA(delta, 'q0', ['q2'])
-# N.deltaHat('q0', '0001')
-# print[(x, N.inLanguage(x)) for x in ['0001', '00010', '100101']]
-# M = convertNFAtoDFA(N)
-# print[(x, M.inLanguage(x)) for x in ['0001', '00010', '100101']]
+
+delta = {'q0': {'0': set(['q0']),
+                '1': set(['q1']),
+                '2': set(['q2']),
+                '3': set(['q3']),
+                '4': set(['q4']),
+                '5': set(['q5']),
+                '6': set(['q6']),
+                '7': set(['q0']),
+                '8': set(['q1']),
+                '9': set(['q2'])
+                },
+        'q1': {'0': set(['q3']),
+                '1': set(['q4']),
+                '2': set(['q5']),
+                '3': set(['q6']),
+                '4': set(['q0']),
+                '5': set(['q1']),
+                '6': set(['q2']),
+                '7': set(['q3']),
+                '8': set(['q4']),
+                '9': set(['q5'])
+                 },
+        'q2': {'0': set(['q6']),
+                '1': set(['q0']),
+                '2': set(['q1']),
+                '3': set(['q2']),
+                '4': set(['q3']),
+                '5': set(['q4']),
+                '6': set(['q5']),
+                '7': set(['q6']),
+                '8': set(['q0']),
+                '9': set(['q1'])
+                },
+        'q3': {'0': set(['q2']),
+                '1': set(['q3']),
+                '2': set(['q4']),
+                '3': set(['q5']),
+                '4': set(['q6']),
+                '5': set(['q0']),
+                '6': set(['q1']),
+                '7': set(['q2']),
+                '8': set(['q3']),
+                '9': set(['q4'])
+                },
+        'q4': {'0': set(['q5']),
+                '1': set(['q6']),
+                '2': set(['q0']),
+                '3': set(['q1']),
+                '4': set(['q2']),
+                '5': set(['q3']),
+                '6': set(['q4']),
+                '7': set(['q5']),
+                '8': set(['q6']),
+                '9': set(['q0'])
+                },
+        'q5': {'0': set(['q1']),
+                '1': set(['q2']),
+                '2': set(['q3']),
+                '3': set(['q4']),
+                '4': set(['q5']),
+                '5': set(['q6']),
+                '6': set(['q0']),
+                '7': set(['q1']),
+                '8': set(['q2']),
+                '9': set(['q3'])
+                },
+        'q6': {'0': set(['q4']),
+                '1': set(['q5']),
+                '2': set(['q6']),
+                '3': set(['q0']),
+                '4': set(['q1']),
+                '5': set(['q2']),
+                '6': set(['q3']),
+                '7': set(['q4']),
+                '8': set(['q5']),
+                '9': set(['q6'])
+                }
+    }
+N = NFA(delta, 'q0', ['q0'])
+N.deltaHat('q0', '0123456789')
+example = ['7', '54', '49', '77', '4326']
+for x in example:
+    print(x, N.inLanguage(x))
+M = convertNFAtoDFA(N)
+for x in example:
+    print(x, M.inLanguage(x))
 
 # # both the above lines should return [('0001', True), ('00010', False), ('100101', True)]
 
 # to run the doctests, run python or python -v directly on this script
-if __name__ == "__main__":
-    import doctest
+#if __name__ == "__main__":
+    #import doctest
 
-    doctest.testmod()
+    #doctest.testmod()
