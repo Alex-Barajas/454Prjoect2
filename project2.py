@@ -136,6 +136,21 @@ def convertNFAtoDFA(N):
 #
 #     curr[key] = count
 
+def count(Table, M, current, next, temp, n):
+
+    count = 0
+    while count < n + 1:
+        for a in range(len(M.Q)):
+            num = 0
+            for b in range(10):
+                test = frozenset(Table[a][b])
+                c = temp[test]
+                num += current[c]
+            next[a] = num
+        current = next
+        count += 1
+    print(next[0])
+
 def main():
     delta = {
         'q0': {
@@ -310,22 +325,31 @@ def main():
 
     N = NFA(delta, 'q0', ['q0', 'q7'])
     # N.deltaHat('q0', '8')
-    convertedDFA = convertNFAtoDFA(N)
-    test = convertedDFA.delta
+    M = convertNFAtoDFA(N)
+    # test = convertedDFA.delta
 
 
-    Table = [[0 for i in range(10)] for i in range(len(convertedDFA.delta))]
 
-    temp = 0
-    for key, value in test.items():
-        temp2 = 0
-        for states in value.items():
-            trans = int(states[0])
-            nextstates = states[1]
-            tempstates = []
-            for elem in nextstates:
-                tempstates.append(elem)
-            Table[temp][trans] = tempstates
-        temp += 1
-    print(Table)
+    Table = [[0 for i in range(10)] for q in M.delta]
+
+    current = [0] * len(M.Q)
+    next = [0] * len(M.Q)
+    i = 0
+    temp = {}
+    for q in M.Q:
+        j = 0
+        temp[q] = i
+        for sym in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+            Table[i][j] = list(M.delta[frozenset(q)][sym])
+            if q in M.F:
+                current[i] = 1
+            j += 1
+        i += 1
+
+    count(Table, M, current, next, temp, 2)
+
+
+
+
+
 main()
