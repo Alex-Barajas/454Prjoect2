@@ -8,14 +8,17 @@
 #
 from functools import reduce
 
+import pprint
+
 
 class DFA:
     """Class that encapsulates a DFA."""
 
-    def __init__(self, transitionFunction, initialState, finalStates):
+    def __init__(self, transitionFunction, initialState, finalStates, stateSet):
         self.delta = transitionFunction
         self.q0 = initialState
         self.F = finalStates
+        self.Q = stateSet
 
     def deltaHat(self, state, inputString):
         for a in inputString:
@@ -29,6 +32,7 @@ class DFA:
 # comments:
 # 	* python dictionary keys must be immutable
 #	* it is a KeyError to extract an entry using a non-existent key
+
 
 class NFA:
     """Class that encapsulates an NFA."""
@@ -87,13 +91,13 @@ def convertNFAtoDFA(N):
             nextStates = reduce(lambda x, y: x | y, [N.deltaHat(q, a) for q in qSet])
             nextStates = frozenset(nextStates)
             delta[qSet][a] = nextStates
-            if nextStates not in Q:
+            if not nextStates in Q:
                 Q.add(nextStates)
                 unprocessedQ.add(nextStates)
     for qSet in Q:
         if len(qSet & N.F) > 0:
             F.append(qSet)
-    M = DFA(delta, q0, F)
+    M = DFA(delta, q0, F, Q)
     return M
 
 
@@ -101,14 +105,14 @@ delta = {
     'q0': {
         '0': set(['q0', 'q7']),
         '1': set(['q1', 'q7']),
-        '2': set(['q3', 'q7']),
-        '3': set(['q4', 'q7']),
-        '4': set(['q5', 'q7']),
-        '5': set(['q6', 'q7']),
-        '6': set(['q0', 'q7']),
-        '7': set(['q1', 'q7']),
-        '8': set(['q2', 'q7']),
-        '9': set(['q3', 'q7'])
+        '2': set(['q2', 'q7']),
+        '3': set(['q3', 'q7']),
+        '4': set(['q4', 'q7']),
+        '5': set(['q5', 'q7']),
+        '6': set(['q6', 'q7']),
+        '7': set(['q0', 'q7']),
+        '8': set(['q1', 'q7']),
+        '9': set(['q2', 'q7'])
     },
     'q1': {
         '0': set(['q3', 'q8']),
@@ -269,13 +273,7 @@ delta = {
 }
 
 N = NFA(delta, 'q0', ['q0', 'q7'])
+# N.deltaHat('q0', '0123456789')
+convertedDFA = convertNFAtoDFA(N)
+pprint.pprint(convertedDFA.delta)
 
-N.deltaHat('q0', '1')
-M = convertNFAtoDFA(N)
-print('')
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()
