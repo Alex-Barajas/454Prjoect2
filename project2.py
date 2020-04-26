@@ -140,15 +140,15 @@ def count(Table, M, current, next, temp, n):
 
     count = 0
     while count < n + 1:
-        for a in range(len(M.Q)):
+        for i in range(len(M.Q)):
             num = 0
-            for b in range(10):
-                test = frozenset(Table[a][b])
-                c = temp[test]
-                num += current[c]
-            next[a] = num
-        current = next
+            for d in range(10):
+                test = frozenset(Table[i][d]) # grabs the next state from t
+                c = temp[test] # gets the position index of the state
+                num += current[c] # using position increases from current -> next
+            next[i] = num
         count += 1
+        current = next
     print(next[0])
 
 def main():
@@ -346,7 +346,7 @@ def main():
             j += 1
         i += 1
 
-    count(Table, M, current, next, temp, 2)
+    count(Table, M, current, next, temp, 8)
 
 
 
