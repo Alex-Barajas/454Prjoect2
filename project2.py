@@ -4,10 +4,9 @@
 # This is Python code for representing finite automata, DFAs and NFAs,
 # and for converting from an NFA into a DFA.
 #
-# Ben Reichardt, 1/17/2011
 #
 from functools import reduce
-
+import copy
 import pprint
 
 
@@ -27,11 +26,6 @@ class DFA:
 
     def inLanguage(self, inputString):
         return self.deltaHat(self.q0, inputString) in self.F
-
-
-# comments:
-# 	* python dictionary keys must be immutable
-#	* it is a KeyError to extract an entry using a non-existent key
 
 
 class NFA:
@@ -91,7 +85,7 @@ def convertNFAtoDFA(N):
             nextStates = reduce(lambda x, y: x | y, [N.deltaHat(q, a) for q in qSet])
             nextStates = frozenset(nextStates)
             delta[qSet][a] = nextStates
-            if nextStates not in Q:
+            if not nextStates in Q:
                 Q.add(nextStates)
                 unprocessedQ.add(nextStates)
     for qSet in Q:
@@ -100,41 +94,18 @@ def convertNFAtoDFA(N):
     M = DFA(delta, q0, F, Q)
     return M
 
-# def nextstate(key, string, prev, curr, sizeOfK):
-#     count = 0
-#     tempA = string + '0'
-#     tempB = string + '1'
-#     tempC = string + '2'
-#     tempD = string + '3'
-#     tempE = string + '4'
-#     tempF = string + '5'
-#     tempG = string + '6'
-#     tempH = string + '7'
-#     tempI = string + '8'
-#     tempJ = string + '9'
-#
-#     if isAccepted(tempA): # give string to dfa
-#         if (len(tempA) > sizeOfK):
-#             tempA = tempA[1:]
-#         if (len(tempA) == sizeOfK):
-#             count += prev[calcPos(tempA)]
-#     #
-#     # if isAccepted(tempB):
-#     #     if (len(tempB) > 5):
-#     #         tempB = tempB[1:]
-#     #     count += prev[calcPos(tempB)]
-#     #
-#     # if isAccepted(tempC):
-#     #     if (len(tempC) > 5):
-#     #         tempC = tempC[1:]
-#     #     count += prev[calcPos(tempC)]
-#     #
-#     # if isAccepted(tempD):
-#     #     if (len(tempD) > 5):
-#     #         tempD = tempD[1:]
-#     #     count += prev[calcPos(tempD)]
-#
-#     curr[key] = count
+
+def count(M, curr, next, n):
+    for i in range(n):
+        for q, v in curr.items():
+            num = 0
+            for sym in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                transition_state = frozenset(M.delta[frozenset(q)][sym])
+                num += curr[transition_state]
+            next[q] = num
+        curr = copy.deepcopy(next)
+    return next
+
 
 def main():
     delta = {
@@ -305,27 +276,87 @@ def main():
             '7': set(['q11']),
             '8': set(['q12']),
             '9': set(['q13'])
+        },
+        'q14': {
+            '0': set(['q17']),
+            '1': set(['q1', 'q8', 'q16']),
+            '2': set(['q2', 'q16']),
+            '3': set(['q3', 'q16']),
+            '4': set(['q4', 'q16']),
+            '5': set(['q5', 'q16']),
+            '6': set(['q6', 'q16']),
+            '7': set(['q15', 'q16']),
+            '8': set(['q1', 'q16']),
+            '9': set(['q2', 'q16'])
+        },
+        'q15': {
+            '0': set(['q0', 'q7']),
+            '1': set(['q1', 'q7']),
+            '2': set(['q2', 'q7']),
+            '3': set(['q3', 'q7']),
+            '4': set(['q4', 'q7']),
+            '5': set(['q5', 'q7']),
+            '6': set(['q6', 'q7']),
+            '7': set(['q0', 'q7']),
+            '8': set(['q1', 'q7']),
+            '9': set(['q2', 'q7'])
+        },
+        'q16': {
+            '0': set(['q7']),
+            '1': set(['q8']),
+            '2': set(['q9']),
+            '3': set(['q10']),
+            '4': set(['q11']),
+            '5': set(['q12']),
+            '6': set(['q13']),
+            '7': set(['q7']),
+            '8': set(['q8']),
+            '9': set(['q9'])
+        },
+        'q17': {
+            '0': set(['q18']),
+            '1': set(['q18']),
+            '2': set(['q18']),
+            '3': set(['q18']),
+            '4': set(['q18']),
+            '5': set(['q18']),
+            '6': set(['q18']),
+            '7': set(['q18']),
+            '8': set(['q18']),
+            '9': set(['q18'])
+        },
+        'q18': {
+            '0': set(['q18']),
+            '1': set(['q18']),
+            '2': set(['q18']),
+            '3': set(['q18']),
+            '4': set(['q18']),
+            '5': set(['q18']),
+            '6': set(['q18']),
+            '7': set(['q18']),
+            '8': set(['q18']),
+            '9': set(['q18'])
         }
     }
 
-    N = NFA(delta, 'q0', ['q0', 'q7'])
+    N = NFA(delta, 'q14', ['q0', 'q7', 'q15', 'q17', ])
     # N.deltaHat('q0', '8')
-    convertedDFA = convertNFAtoDFA(N)
-    test = convertedDFA.delta
+    M = convertNFAtoDFA(N)
+    # test = convertedDFA.delta
 
+    curr = {}
+    next = {}
+    for q in M.Q:
+        if q in M.F:
+            curr[q] = 1
+        else:
+            curr[q] = 0
+        next[q] = 0
 
-    Table = [[0 for i in range(10)] for i in range(len(convertedDFA.delta))]
+    n = int(input("Enter a value for n or any negative value to exit: "))
+    while n > 0:
+        final = count(M, curr, next, n)
+        print(final[M.q0])
+        n = int(input("Enter a value for n or any negative value to exit: "))
 
-    temp = 0
-    for key, value in test.items():
-        temp2 = 0
-        for states in value.items():
-            trans = int(states[0])
-            nextstates = states[1]
-            tempstates = []
-            for elem in nextstates:
-                tempstates.append(elem)
-            Table[temp][trans] = tempstates
-        temp += 1
-    print(Table)
 main()
