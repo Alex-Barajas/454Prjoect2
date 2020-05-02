@@ -6,7 +6,7 @@
 #
 #
 from functools import reduce
-
+import copy
 import pprint
 
 
@@ -103,8 +103,8 @@ def count(M, curr, next, n):
                 transition_state = frozenset(M.delta[frozenset(q)][sym])
                 num += curr[transition_state]
             next[q] = num
-        curr = next
-    print(curr[q])
+        curr = copy.deepcopy(next)
+    return next
 
 
 def main():
@@ -344,26 +344,19 @@ def main():
     M = convertNFAtoDFA(N)
     # test = convertedDFA.delta
 
-    n = int(input("Enter a value for n: "))
     curr = {}
     next = {}
-    index = {}
-    Table = [[0 for i in range(10)] for q in M.Q]
-    i = 0
     for q in M.Q:
-        for sym in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-            index[q] = i
-            out = list(M.delta[frozenset(q)][sym])
-            Table[i][int(sym)] = out
-            if q in M.F:
-                curr[q] = 1
-                next[q] = 0
-            else:
-                curr[q] = 0
-                next[q] = 0
-        i += 1
+        if q in M.F:
+            curr[q] = 1
+        else:
+            curr[q] = 0
+        next[q] = 0
 
-    count(M, curr, next, n)
-
+    n = int(input("Enter a value for n or any negative value to exit: "))
+    while n > 0:
+        final = count(M, curr, next, n)
+        print(final[M.q0])
+        n = int(input("Enter a value for n or any negative value to exit: "))
 
 main()
